@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import shelve
+import simplejson
+import sys
+import urllib
+
+FETCH_URL = "http://www.reddit.com/r/A858DE45F56D9BC9/.json"
+
+db = shelve.open("archive.db")
+
+stream = urllib.urlopen(FETCH_URL)
+data = stream.read()
+stream.close()
+
+try:
+	decoded = simplejson.loads(data)
+	assert "data" in decoded
+except:
+	print >> sys.stderr, "Failed to decode Subreddit contents:"
+	print >> sys.stderr, data
+	sys.exit(-1)
+
+posts = decoded["data"]["children"]
+
+for post in posts:
+	id = post["data"]["id"]
+	created = post["data"]["created_utc"]
+	title = post["data"]["title"]
+
+	# Combine data to create the key. This allows us to show some
+	# basic info on the website without needing to fetch all data.
+
+	key = "%i-%s-%s" % (int(created), id, title)
+
+	# Store new post? Only if we didn't already save it.
+
+	if key not in db:
+		db[key] = post
+
+db.sync()
+
