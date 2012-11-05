@@ -8,9 +8,13 @@ import urllib
 
 FETCH_URL = "http://www.reddit.com/r/A858DE45F56D9BC9/.json"
 
+class A8URLOpener(urllib.URLopener):
+	version = 'A858 Auto-indexer by /u/fragglet'
+
 db = shelve.open("archive.db")
 
-stream = urllib.urlopen(FETCH_URL)
+opener = A8URLOpener()
+stream = opener.open(FETCH_URL)
 data = stream.read()
 stream.close()
 
