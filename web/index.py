@@ -42,7 +42,8 @@ def format_post(post):
 		name, callback = x
 		return "%s: %s" % (name, callback(post))
 
-	return html.h3(html.a(url, html.escape(title))) \
+	return html.a(name=id) \
+	     + html.h3(html.a(html.escape(title), href=url)) \
 	     + html.ul(*map(formatted, decoders))
 
 

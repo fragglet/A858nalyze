@@ -2,9 +2,14 @@
 from cgi import escape
 
 def _wrapper(name):
-	def result(*inner):
+	def attr_str(item):
+		key, value = item
+		return " %s='%s'" % (key, escape(value, True))
+	def attrs_str(attrs):
+		return "".join(map(attr_str, attrs.items()))
+	def result(*inner, **attrs):
 		x = "".join(inner)
-		return "<%s>%s</%s>" % (name, x, name)
+		return "<%s%s>%s</%s>" % (name, attrs_str(attrs), x, name)
 	return result
 
 def _list_wrapper(name):
@@ -29,6 +34,5 @@ h3 = _wrapper('h3')
 ul = _list_wrapper('ul')
 ol = _list_wrapper('ol')
 
-def a(href, inner):
-	return "<a href='%s'>%s</a>" % (href, inner)
+a = _wrapper('a')
 
