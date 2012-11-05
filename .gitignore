@@ -1,2 +1,3 @@
+*.pyc
 archive.db
 .gitignore

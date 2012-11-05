@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from analyze import analyze
 import shelve
 import simplejson
 import sys
@@ -34,8 +35,10 @@ for post in posts:
 	key = "%i-%s-%s" % (int(created), id, title)
 
 	# Store new post? Only if we didn't already save it.
+	# Perform analysis functions on post.
 
 	if key not in db:
+		analyze(post)
 		db[key] = post
 
 db.sync()

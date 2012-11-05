@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+#
+# Re-run analysis for all posts in the database.
+#
+
+from analyze import analyze
+import shelve
+
+db = shelve.open("archive.db")
+for key in db.keys():
+	post = db[key]
+	analyze(post)
+	db[key] = post
+
+db.sync()
+
