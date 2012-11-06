@@ -15,7 +15,11 @@ def statistics(post):
 	else:
 		lenfield += "(does NOT match pattern!)"
 
-	return html.ul(lenfield)
+	return html.ul(
+		lenfield,
+		"Statistical distribution: %s" % \
+		    post["analysis"]["distribution"],
+	)
 
 def file_type(post):
 	return post["analysis"]["mime"]

@@ -1,3 +1,4 @@
+import math
 import os
 import re
 import tempfile
@@ -28,6 +29,29 @@ def hexdump(data):
 	return system("hexdump -C", data)
 
 
+def histogram(data):
+	result = [0] * 256
+	for c in data:
+		result[ord(c)] += 1
+	return result
+
+
+def histogram_analysis(data, dist):
+	# Assume a binominal distribution.
+	# If any of the values is more than 6 standard deviations from
+	# the mean then it may be statistically significant.
+
+	n = len(data)
+	p = 1 / 256.0
+	expected = n * p
+	stddev = math.sqrt(n * p * (1 - p))
+	for d in dist:
+		if abs(expected - d) > stddev * 6:
+			return "Possibly non-uniform"
+
+	return "Uniform"
+
+
 def decode_data(text):
 	"""Decode hex-encoded data into binary."""
 
@@ -49,9 +73,12 @@ def decode_data(text):
 
 def analyze(post):
 	data = decode_data(post["data"]["selftext"])
+	dist = histogram(data)
 
 	post["analysis"] = {
 		"data": data,
+		"histogram": dist,
+		"distribution": histogram_analysis(data, dist),
 		"mime": file_type(data),
 		"hexdump": hexdump(data),
 	}
