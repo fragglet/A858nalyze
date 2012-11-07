@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+#
+# Script to manually add old posts to the database.
+#
+
+import fetch
+import sys
+
+if len(sys.argv) < 2:
+	print "Usage: %s <URL>" % sys.argv[0]
+	sys.exit(0)
+
+data = fetch.fetch(sys.argv[1] + "/.json")
+
+assert type(data) == list, "Not a list"
+
+post = data[0]["data"]["children"][0]
+print "Adding post: %s" % post["data"]["title"]
+confirm = raw_input("Continue? (y/n)").strip()
+if confirm == 'y':
+	fetch.save_post(post)
+
