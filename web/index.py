@@ -3,7 +3,7 @@
 import shelve
 import html
 
-db = shelve.open("archive.db")
+db = shelve.open("../archive.db", 'r')
 
 def statistics(post):
 	"""Print statistics about post."""
@@ -61,8 +61,8 @@ def gen_html():
 		)
 	)
 
-#print "Content-Type: text/html"
-#print
+print "Content-Type: text/html"
+print
 
 print gen_html()
 
