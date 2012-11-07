@@ -22,7 +22,7 @@ def system(command, data):
 def file_type(data):
 	"""Attempt to identify file MIME type."""
 	output = system("file", data)
-	return re.sub(r"\S+: ", "", system("file", data))
+	return re.sub(r"\S+: ", "", system("file", data)).strip()
 
 
 def hexdump(data):

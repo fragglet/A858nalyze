@@ -35,7 +35,11 @@ def time_data(post):
 	)
 
 def file_type(post):
-	return post["analysis"]["mime"]
+	mime = post["analysis"]["mime"]
+	if mime == "data":
+		return "unknown"
+	else:
+		return mime
 
 
 def plain_text(post):
@@ -45,10 +49,10 @@ def plain_text(post):
 
 
 decoders = [
-	("Statistics",   statistics),
-	("Date/time",    time_data),
-	("File type",    file_type),
-	("Text",         plain_text),
+	("Statistics",        statistics),
+	("Date/time",         time_data),
+	("File type (MIME)",  file_type),
+	("Text",              plain_text),
 ]
 
 def format_post(post):
