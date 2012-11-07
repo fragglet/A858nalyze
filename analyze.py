@@ -55,14 +55,21 @@ def histogram_analysis(data, dist):
 def analyze_time(post):
 	"""Analyze time in post title."""
 	title_time = time.strptime(post["data"]["title"], "%Y%m%d%H%M")
+	title_time = (title_time.tm_year, title_time.tm_mon, title_time.tm_mday,
+	              title_time.tm_hour, title_time.tm_min, title_time.tm_sec,
+	              0, 0, 0)
+	title_time_secs = time.mktime(title_time) - time.timezone
 	post_time_secs = int(float(post["data"]["created_utc"]))
 	post_time = time.gmtime(post_time_secs)
-	title_time_secs = time.mktime(title_time) - time.timezone
 
 	# Offset of time in title from the UTC post time gives the time zone.
 	# Round to nearest time zone.
 
-	tz_hours = int((title_time_secs - post_time_secs - 1800) / 3600)
+	if title_time_secs < post_time_secs:
+		tz_hours = int((title_time_secs - post_time_secs - 1800) / 3600)
+	else:
+		tz_hours = int((title_time_secs - post_time_secs + 1800) / 3600)
+
 	if tz_hours < 0:
 		tz = "UTC%i" % tz_hours
 	elif tz_hours == 0:
