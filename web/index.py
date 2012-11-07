@@ -21,6 +21,15 @@ def statistics(post):
 		    post["analysis"]["distribution"],
 	)
 
+def time_data(post):
+	timedata = post["analysis"]["time"]
+	return html.ul(
+		"Time in post title: %s" % timedata["title_time_str"],
+		"Posted to Reddit: %s UTC" % timedata["post_time_str"],
+		"Identified time zone: %s" % timedata["timezone"],
+		"Post delay: %i seconds" % timedata["post_delay"],
+	)
+
 def file_type(post):
 	return post["analysis"]["mime"]
 
@@ -33,6 +42,7 @@ def plain_text(post):
 
 decoders = [
 	("Statistics",   statistics),
+	("Date/time",    time_data),
 	("File type",    file_type),
 	("Text",         plain_text),
 ]

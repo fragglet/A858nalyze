@@ -2,6 +2,7 @@ import math
 import os
 import re
 import tempfile
+import time
 
 HEXCHARS = "0123456789abcdef"
 
@@ -51,6 +52,40 @@ def histogram_analysis(data, dist):
 
 	return "Uniform"
 
+def analyze_time(post):
+	"""Analyze time in post title."""
+	title_time = time.strptime(post["data"]["title"], "%Y%m%d%H%M")
+	post_time_secs = int(float(post["data"]["created_utc"]))
+	post_time = time.gmtime(post_time_secs)
+	title_time_secs = time.mktime(title_time) - time.timezone
+
+	# Offset of time in title from the UTC post time gives the time zone.
+	# Round to nearest time zone.
+
+	tz_hours = int((title_time_secs - post_time_secs - 1800) / 3600)
+	if tz_hours < 0:
+		tz = "UTC%i" % tz_hours
+	elif tz_hours == 0:
+		tz = "UTC"
+	else:
+		tz = "UTC+%i" % tz_hours
+
+	# Assume the messages are posted by an automated script; if the
+	# script starts running at the head of the minute, it will take
+	# a short amount of time to start, construct the message and
+	# post to Reddit. What is the difference in seconds between the
+	# time in the title and the time when the message was posted?
+
+	post_delay = post_time_secs - (title_time_secs - tz_hours * 3600)
+
+	return {
+		"title_time" : tuple(title_time),
+		"title_time_str" : time.asctime(title_time),
+		"post_time_str" : time.asctime(post_time),
+		"timezone" : tz,
+		"post_delay" : post_delay,
+	}
+
 
 def decode_data(text):
 	"""Decode hex-encoded data into binary."""
@@ -81,4 +116,5 @@ def analyze(post):
 		"distribution": histogram_analysis(data, dist),
 		"mime": file_type(data),
 		"hexdump": hexdump(data),
+		"time": analyze_time(post),
 	}
