@@ -40,7 +40,7 @@ decoders = [
 def format_post(post):
 	id = post["data"]["id"]
 	title = post["data"]["title"]
-	url = "http://www.reddit.com/r/A858DE45F56D9BC9/comments/%s" % id
+	url = post["data"]["url"]
 
 	def formatted(x):
 		name, callback = x
