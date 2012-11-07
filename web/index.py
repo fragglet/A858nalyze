@@ -21,12 +21,16 @@ def statistics(post):
 		    post["analysis"]["distribution"],
 	)
 
+def timezone_link(zone):
+	return html.a(zone, href="https://en.wikipedia.org/wiki/%s" % zone)
+
 def time_data(post):
 	timedata = post["analysis"]["time"]
 	return html.ul(
 		"Time in post title: %s" % timedata["title_time_str"],
 		"Posted to Reddit: %s UTC" % timedata["post_time_str"],
-		"Identified time zone: %s" % timedata["timezone"],
+		"Identified time zone: %s" % \
+		    timezone_link(timedata["timezone"]),
 		"Post delay: %i seconds" % timedata["post_delay"],
 	)
 
