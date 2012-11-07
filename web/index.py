@@ -21,8 +21,10 @@ def statistics(post):
 		    post["analysis"]["distribution"],
 	)
 
+
 def timezone_link(zone):
 	return html.a(zone, href="https://en.wikipedia.org/wiki/%s" % zone)
+
 
 def time_data(post):
 	timedata = post["analysis"]["time"]
@@ -45,7 +47,10 @@ def file_type(post):
 def plain_text(post):
 	"""Print plain text of post."""
 	text = post["data"]["selftext"]
-	return "<br>" + html.tt(html.escape(text))
+	# Format text so that it is (usually?) four groups wide.
+	# This makes it 256 bits per line.
+	return "<br>" + html.div(html.tt(html.escape(text)),
+	                         style="width: 38em;")
 
 
 decoders = [

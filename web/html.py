@@ -24,6 +24,8 @@ body = _wrapper('body')
 head = _wrapper('head')
 title = _wrapper('title')
 
+div = _wrapper('div')
+
 tt = _wrapper('tt')
 pre = _wrapper('pre')
 
