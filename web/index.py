@@ -12,6 +12,16 @@ MESSAGES_PER_PAGE = 20
 form = cgi.FieldStorage()
 db = shelve.open("../archive.db", 'r')
 
+def expander(name, inner):
+	control = html.span("&#x25ba;",
+	                    id="control-%s" % name,
+	                    onclick='expand("%s");' % name)
+	div = html.div(inner,
+	               id="inner-%s" % name,
+	               style="display: none;")
+
+	return control + div
+
 def statistics(post):
 	"""Print statistics about post."""
 	data = post["analysis"]["data"]
@@ -43,6 +53,7 @@ def time_data(post):
 		"Post delay: %i seconds" % timedata["post_delay"],
 	)
 
+
 def file_type(post):
 	mime = post["analysis"]["mime"]
 	if mime == "data":
@@ -53,11 +64,22 @@ def file_type(post):
 
 def plain_text(post):
 	"""Print plain text of post."""
+	id = post["data"]["id"]
 	text = post["data"]["selftext"]
 	# Format text so that it is (usually?) four groups wide.
 	# This makes it 256 bits per line.
-	return "<br>" + html.div(html.tt(html.escape(text)),
-	                         style="width: 38em;")
+	plaintext = html.div(html.tt(html.escape(text)), style="width: 38em;")
+	return expander("plaintext-%s" % id, plaintext)
+
+
+def hex_dump(post):
+	"""Print hex dump of post."""
+	id = post["data"]["id"]
+	text = post["analysis"]["hexdump"]
+	# Format text so that it is (usually?) four groups wide.
+	# This makes it 256 bits per line.
+	plaintext = html.pre(html.escape(text))
+	return expander("hexdump-%s" % id, plaintext)
 
 
 decoders = [
@@ -65,6 +87,7 @@ decoders = [
 	("Date/time",         time_data),
 	("File type (MIME)",  file_type),
 	("Text",              plain_text),
+	("Hex dump",          hex_dump),
 ]
 
 def format_post(post):
@@ -76,9 +99,10 @@ def format_post(post):
 		name, callback = x
 		return "%s: %s" % (name, callback(post))
 
-	return html.a(name=id) \
-	     + html.h3(html.a(html.escape(title), href=url)) \
-	     + html.ul(*map(formatted, decoders))
+	return html.div(html.a(name=id),
+	                html.h3(html.a(html.escape(title), href=url)),
+	                html.ul(*map(formatted, decoders)),
+	                id="post-%s" % id)
 
 
 def gen_pager(messages, position):
@@ -113,7 +137,10 @@ def gen_html():
 	pager = gen_pager(messages, start)
 
 	return html.html(
-		html.head(html.title("a858 auto-analysis")),
+		html.head(
+			html.title("a858 auto-analysis"),
+			html.script(language='javascript', src='functions.js')
+		),
 		html.body(
 			pager,
 			html.h1("a858 auto-analysis"),
