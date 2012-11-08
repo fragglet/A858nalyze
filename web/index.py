@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 
+import cgitb
+cgitb.enable()
+
+import cgi
 import shelve
 import html
 
+MESSAGES_PER_PAGE = 20
+
+form = cgi.FieldStorage()
 db = shelve.open("../archive.db", 'r')
 
 def statistics(post):
@@ -74,13 +81,45 @@ def format_post(post):
 	     + html.ul(*map(formatted, decoders))
 
 
+def gen_pager(messages, position):
+	num_pages = (len(messages) + MESSAGES_PER_PAGE - 1) / MESSAGES_PER_PAGE
+	this_page = position / MESSAGES_PER_PAGE
+
+	result = []
+	for i in range(num_pages):
+		label = "%i" % (i + 1)
+		if this_page == i:
+			result.append(label)
+		else:
+			if i == 0:
+				url = "/"
+			else:
+				url = "/?start=%i" % (i * MESSAGES_PER_PAGE)
+
+			result.append(html.a(label, href=url))
+
+	return html.div("Page: ", *(" ".join(result)),
+	                style="float: right; width: 50%; text-align: right;")
+
+
 def gen_html():
+	# Which messages to show?
+	messages = list(reversed(sorted(db.keys())))
+	if "start" in form:
+		start = int(form["start"].value)
+	else:
+		start = 0
+	page_messages = messages[start:start + MESSAGES_PER_PAGE]
+	pager = gen_pager(messages, start)
+
 	return html.html(
 		html.head(html.title("a858 auto-analysis")),
 		html.body(
+			pager,
 			html.h1("a858 auto-analysis"),
-			*map(lambda key: format_post(db[key]),
-			     reversed(sorted(db.keys())))
+			html.div(*map(lambda key: format_post(db[key]),
+			         page_messages)),
+			pager
 		)
 	)
 
