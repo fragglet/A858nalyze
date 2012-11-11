@@ -90,6 +90,7 @@ decoders = [
 	("Hex dump",          hex_dump),
 ]
 
+
 def format_post(post):
 	id = post["data"]["id"]
 	title = post["data"]["title"]
@@ -99,9 +100,13 @@ def format_post(post):
 		name, callback = x
 		return "%s: %s" % (name, callback(post))
 
+	items = map(formatted, decoders) + [
+		html.a("Permalink", href="/?id=%s" % id)
+	]
+
 	return html.div(html.a(name=id),
 	                html.h3(html.a(html.escape(title), href=url)),
-	                html.ul(*map(formatted, decoders)),
+	                html.ul(*items),
 	                id="post-%s" % id)
 
 
@@ -126,7 +131,7 @@ def gen_pager(messages, position):
 	                style="float: right; width: 50%; text-align: right;")
 
 
-def gen_html():
+def list_messages():
 	# Which messages to show?
 	messages = list(reversed(sorted(db.keys())))
 	if "start" in form:
@@ -136,18 +141,43 @@ def gen_html():
 	page_messages = messages[start:start + MESSAGES_PER_PAGE]
 	pager = gen_pager(messages, start)
 
+	return html.body(
+		pager,
+		html.h1("a858 auto-analysis"),
+		html.div(*map(lambda key: format_post(db[key]),
+		              page_messages)),
+		pager
+	)
+
+
+def single_message():
+	id = form["id"].value
+	for key in db.keys():
+		if ("-%s-" % id) in key:
+			post = db[key]
+			break
+	else:
+		return "Unknown message: %s" % id
+
+	return html.body(
+		html.h1(html.escape(post["data"]["title"])),
+		format_post(post),
+	)
+
+
+
+def gen_html():
+	if "id" in form:
+		body = single_message()
+	else:
+		body = list_messages()
+
 	return html.html(
 		html.head(
 			html.title("a858 auto-analysis"),
 			html.script(language='javascript', src='functions.js')
 		),
-		html.body(
-			pager,
-			html.h1("a858 auto-analysis"),
-			html.div(*map(lambda key: format_post(db[key]),
-			         page_messages)),
-			pager
-		)
+		body
 	)
 
 print "Content-Type: text/html"
