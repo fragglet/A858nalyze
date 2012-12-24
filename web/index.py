@@ -6,6 +6,7 @@ cgitb.enable()
 import cgi
 import shelve
 import html
+import math
 
 MESSAGES_PER_PAGE = 20
 
@@ -22,6 +23,7 @@ def expander(name, inner):
 
 	return control + div
 
+
 def statistics(post):
 	"""Print statistics about post."""
 	data = post["analysis"]["data"]
@@ -37,6 +39,35 @@ def statistics(post):
 		"Statistical distribution: %s" % \
 		    post["analysis"]["distribution"],
 	)
+
+
+def histogram_grid(post):
+	histogram = post["analysis"]["histogram"]
+	id = post["data"]["id"]
+
+        n = len(post["analysis"]["data"])
+	p = 1 / 256.0
+	expected = n * p
+	stddev = math.sqrt(n * p * (1 - p))
+	if stddev == 0:
+		stddev = 1
+
+	rows = []
+	for y in range(16):
+		row = []
+		for x in range(16):
+			i = y * 16 + x
+			value = histogram[i]
+			offset = float(value - expected) / (stddev * 8)
+			bright = min(max(int(offset * 128 + 127), 0), 255)
+			bgcolor = "#%02x%02x%02x" % (bright, bright, bright)
+			td = html.td("&nbsp;" * 5, bgcolor=bgcolor,
+			             title="0x%02x: %i" % (i, value))
+			row.append(td)
+
+		rows.append(html.tr(*row))
+
+	return expander("histogram-grid-%s" % id, html.table(*rows))
 
 
 def timezone_link(zone):
@@ -88,6 +119,7 @@ decoders = [
 	("File type (MIME)",  file_type),
 	("Text",              plain_text),
 	("Hex dump",          hex_dump),
+	("Histogram grid",    histogram_grid),
 ]
 
 

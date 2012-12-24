@@ -47,3 +47,7 @@ ol = _list_wrapper('ol')
 
 a = _wrapper('a')
 
+table = _wrapper('table')
+tr = _wrapper('tr')
+td = _wrapper('td')
+
