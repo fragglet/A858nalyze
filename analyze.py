@@ -46,11 +46,21 @@ def histogram_analysis(data, dist):
 	p = 1 / 256.0
 	expected = n * p
 	stddev = math.sqrt(n * p * (1 - p))
+	biggest_diff = 0
 	for d in dist:
-		if abs(expected - d) > stddev * 6:
-			return "Possibly non-uniform"
+		diff = abs(expected - d)
+		if diff > biggest_diff:
+			biggest_diff = diff
 
-	return "Uniform"
+	if stddev > 0:
+		diff_stddev = float(biggest_diff) / stddev
+	else:
+		diff_stddev = 0
+
+	if diff_stddev > 6:
+		return "Possibly non-uniform (%.02f stddevs)" % diff_stddev
+	else:
+		return "Uniform (<= %.02f stddevs)" % diff_stddev
 
 def analyze_time(post):
 	"""Analyze time in post title."""
