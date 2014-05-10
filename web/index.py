@@ -9,6 +9,9 @@ import html
 import math
 
 MESSAGES_PER_PAGE = 20
+MIME_LINK = html.a("[Should I be excited about this?]",
+                   href="http://www.reddit.com/r/Solving_A858/comments/"
+                        "24vml1/mime_type/chb5k2e?context=3")
 
 form = cgi.FieldStorage()
 db = shelve.open("../archive.db", 'r')
@@ -90,7 +93,7 @@ def file_type(post):
 	if mime == "data":
 		return "unknown"
 	else:
-		return mime
+		return mime + " " + MIME_LINK
 
 
 def plain_text(post):
