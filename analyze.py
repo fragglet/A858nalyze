@@ -67,7 +67,7 @@ def analyze_time(post):
 	title_time = time.strptime(post["data"]["title"], "%Y%m%d%H%M")
 	title_time = (title_time.tm_year, title_time.tm_mon, title_time.tm_mday,
 	              title_time.tm_hour, title_time.tm_min, title_time.tm_sec,
-	              0, 0, 0)
+	              title_time.tm_wday, 0, 0)
 	title_time_secs = time.mktime(title_time) - time.timezone
 	post_time_secs = int(float(post["data"]["created_utc"]))
 	post_time = time.gmtime(post_time_secs)
