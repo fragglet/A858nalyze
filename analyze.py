@@ -121,6 +121,8 @@ def decode_data(text):
 			result.append("%c" % n)
 			oldindex = None
 	return "".join(result)
+
+
 def mean(data):
 	n = len(data)
 	result = 0
