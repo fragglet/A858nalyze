@@ -123,14 +123,70 @@ def decode_data(text):
 	return "".join(result)
 
 
+def mean(data):
+	n = len(data)
+	result = 0
+	for c in data:
+		result += ord(c)
+	return float(result)/float(n)
+
+def variance(data,mean):
+	n = len(data)
+	result = 0
+	for c in data:
+		result += math.pow((ord(c)-mean),2)
+	return result/n
+
+def skewness(data,mean,sigma):
+	n = len(data)
+	result = 0
+	for c in data:
+		result += math.pow((ord(c)-mean),3)
+	return (result/n)/math.pow(sigma,3)
+
+def excess(data,mean,sigma):
+	n = len(data)
+	result = 0
+	for c in data:
+		result += math.pow((ord(c)-mean),4)
+	return ((result/n)/math.pow(sigma,4))-3
+
+def probabilities(data,dist):
+	result = [0] * 256
+	n = len(data)
+	for c in range(256):
+		result[c] = float(dist[c])/float(n)
+	return result
+
+def entropy(prob):
+	ent = 0
+	for p in prob:
+		if (p != 0):
+			ent += p * math.log(1/p,2)
+	return "%0.2f bits per byte" % ent
+
+
+
 def analyze(post):
 	data = decode_data(post["data"]["selftext"])
 	dist = histogram(data)
+	prob = probabilities(data,dist)
+	meann = mean(data)
+	variancen = variance(data,meann)
+	sigma = math.sqrt(variancen)
+	sk = skewness(data,meann,sigma)
+	ex = excess(data,meann,sigma)
 
 	post["analysis"] = {
 		"data": data,
 		"histogram": dist,
 		"distribution": histogram_analysis(data, dist),
+		"entropy": entropy(prob),
+		"mean": meann,
+		"variance": variancen,
+		"sigma": sigma,
+		"sk": sk,
+		"ex": ex,
 		"mime": file_type(data),
 		"hexdump": hexdump(data),
 		"time": analyze_time(post),

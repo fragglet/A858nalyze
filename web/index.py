@@ -26,7 +26,6 @@ def expander(name, inner):
 
 	return control + div
 
-
 def statistics(post):
 	"""Print statistics about post."""
 	data = post["analysis"]["data"]
@@ -41,6 +40,18 @@ def statistics(post):
 		lenfield,
 		"Statistical distribution: %s" % \
 		    post["analysis"]["distribution"],
+		"Entropy: %s" % \
+		    post["analysis"]["entropy"],
+		"Mean: %0.2f" % \
+		    post["analysis"]["mean"],
+		"Variance: %0.2f" % \
+		    post["analysis"]["variance"],
+		"Stdev: %0.2f" % \
+		    post["analysis"]["sigma"],
+		"Skewness: %0.2f" % \
+		    post["analysis"]["sk"],
+		"Kurtosis: %0.2f" % \
+		    post["analysis"]["ex"],
 	)
 
 
