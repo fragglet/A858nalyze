@@ -10,11 +10,19 @@ import math
 
 MESSAGES_PER_PAGE = 20
 MIME_LINK = html.a("[Should I be excited about this?]",
-                   href="http://www.reddit.com/r/Solving_A858/comments/"
+                   href="https://www.reddit.com/r/Solving_A858/comments/"
                         "24vml1/mime_type/chb5k2e?context=3")
 
 form = cgi.FieldStorage()
 db = shelve.open("../archive.db", 'r')
+
+def reddit_user(username):
+	return html.a("/u/" + username,
+	              href="https://www.reddit.com/u/" + username)
+
+def credits():
+	return "By %s and %s" % (reddit_user("fragglet"),
+	                         reddit_user("kamalist"))
 
 def expander(name, inner):
 	control = html.span("&#x25ba;",
@@ -190,6 +198,7 @@ def list_messages():
 	return html.body(
 		pager,
 		html.h1("a858 auto-analysis"),
+		credits(),
 		html.div(*map(lambda key: format_post(db[key]),
 		              page_messages)),
 		pager
