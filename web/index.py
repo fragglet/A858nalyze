@@ -8,6 +8,7 @@ import shelve
 import html
 import math
 
+MAX_PAGES = 20
 MESSAGES_PER_PAGE = 20
 MIME_LINK = html.a("[Should I be excited about this?]",
                    href="https://www.reddit.com/r/Solving_A858/comments/"
@@ -164,25 +165,43 @@ def format_post(post):
 	                id="post-%s" % id)
 
 
+def page_link(label, offset):
+	if offset == 0:
+		url = "/"
+	else:
+		url = "/?start=%i" % offset
+
+	return html.a(label, href=url)
+
+
 def gen_pager(messages, position):
-	num_pages = (len(messages) + MESSAGES_PER_PAGE - 1) / MESSAGES_PER_PAGE
+	total_pages = ((len(messages) + MESSAGES_PER_PAGE - 1)
+	               / MESSAGES_PER_PAGE)
 	this_page = position / MESSAGES_PER_PAGE
 
+	start_page = min(max(this_page - (MAX_PAGES / 2), 0),
+	                 total_pages - MAX_PAGES)
+	num_pages = min(total_pages, MAX_PAGES)
+
 	result = []
-	for i in range(num_pages):
-		label = "%i" % (i + 1)
-		if this_page == i:
+	for page in range(start_page, start_page + num_pages):
+		label = "%i" % (page + 1)
+		if this_page == page:
 			result.append(label)
 		else:
-			if i == 0:
-				url = "/"
-			else:
-				url = "/?start=%i" % (i * MESSAGES_PER_PAGE)
+			result.append(page_link(label,
+			                        page * MESSAGES_PER_PAGE))
 
-			result.append(html.a(label, href=url))
+	if start_page > 0:
+		result.insert(0, "...")
+		result.insert(0, page_link("&laquo; First", 0))
+	if start_page + num_pages < total_pages:
+		result.append("...")
+		result.append(page_link("Last &raquo;",
+		    (total_pages - 1) * MESSAGES_PER_PAGE))
 
-	return html.div("Page: ", *(" ".join(result)),
-	                style="float: right; width: 50%; text-align: right;")
+	return html.div(*(" ".join(result)),
+	                style="float: right; width: 70%; text-align: right;")
 
 
 def list_messages():
