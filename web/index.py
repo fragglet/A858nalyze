@@ -99,6 +99,8 @@ def timezone_link(zone):
 
 def time_data(post):
 	timedata = post["analysis"]["time"]
+	if timedata is None:
+		return ""
 	return html.ul(
 		"Time in post title: %s" % timedata["title_time_str"],
 		"Posted to Reddit: %s UTC" % timedata["post_time_str"],

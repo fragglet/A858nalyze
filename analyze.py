@@ -64,7 +64,10 @@ def histogram_analysis(data, dist):
 
 def analyze_time(post):
 	"""Analyze time in post title."""
-	title_time = time.strptime(post["data"]["title"], "%Y%m%d%H%M")
+	try:
+		title_time = time.strptime(post["data"]["title"], "%Y%m%d%H%M")
+	except:
+		return None
 	title_time = (title_time.tm_year, title_time.tm_mon, title_time.tm_mday,
 	              title_time.tm_hour, title_time.tm_min, title_time.tm_sec,
 	              title_time.tm_wday, 0, 0)
