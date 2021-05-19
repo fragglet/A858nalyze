@@ -3,7 +3,7 @@
 import fetch
 import sys
 
-FETCH_URL = "http://www.reddit.com/r/A858DE45F56D9BC9/.json"
+FETCH_URL = "https://www.reddit.com/r/A858DE45F56D9BC9/.json"
 EXPECT_FAIL = False
 
 try:
